@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root { --navy: #002e5b; --gold: #b8860b; }
+body { font-family: 'Segoe UI', Arial; background: #f4f7f9; margin-top: 100px; }
+.header { background: var(--navy); color: white; text-align: center; padding: 20px; border-bottom: 5px solid var(--gold); position:fixed; top:0; width:100%; }
+.card { background: white; padding: 20px; border-radius: 12px; margin: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+input, textarea, select { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+.btn { background: var(--navy); color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+label { font-weight: bold; color: #444; }
+</style>
+</head>
+<body>
+<div class="header">
+<h2 style="margin:0; font-size:20px;">SAGAR PUBLIC SCHOOL</h2>
+<p style="margin:5px 0 0; font-size:12px;">TEACHER PANEL</p>
+</div>
+<div class="card">
+<label>Select Class</label>
+<select id="sClass"><option>Nursery</option><option>LKG</option><option>UKG</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+<label>Subject</label>
+<input type="text" id="subject" placeholder="e.g. Hindi, Math">
+<label>Homework Details</label>
+<textarea id="content" rows="5" placeholder="Write details here..."></textarea>
+<button class="btn" onclick="post()">POST TO DIARY</button>
+</div>
+
+<script>
+// YAHAN APNA WEB APP URL DALEIN
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwU696rk0Akx5MC8vO8dhEm9NX15b6yjx8w4wcoWUWyRVtAyXwOtIjeTN7CGFM7X-_M/exec";
+
+function post() {
+  var btn = document.querySelector('.btn');
+  var data = {
+    sClass: document.getElementById('sClass').value,
+    subject: document.getElementById('subject').value,
+    content: document.getElementById('content').value
+  };
+  if(!data.subject || !data.content) return alert("Fill all fields");
+  
+  btn.innerText = "POSTING...";
+  btn.disabled = true;
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "submitHomework", data: data })
+  })
+  .then(res => res.json())
+  .then(res => {
+    alert("Homework Posted Successfully!");
+    location.reload();
+  })
+  .catch(err => {
+    alert("Error! Please try again.");
+    btn.innerText = "POST TO DIARY";
+    btn.disabled = false;
+  });
+}
+</script>
+</body>
+</html>
