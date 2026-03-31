@@ -2,10 +2,11 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 :root { --navy: #002e5b; --gold: #b8860b; }
 body { font-family: 'Segoe UI', Arial; background: #f4f7f9; margin-top: 100px; }
-.header { background: var(--navy); color: white; text-align: center; padding: 20px; border-bottom: 5px solid var(--gold); position:fixed; top:0; width:100%; }
+.header { background: var(--navy); color: white; text-align: center; padding: 20px; border-bottom: 5px solid var(--gold); position:fixed; top:0; width:100%; z-index:1000; }
 .card { background: white; padding: 20px; border-radius: 12px; margin: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
 input, textarea, select { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 .btn { background: var(--navy); color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
@@ -13,13 +14,20 @@ label { font-weight: bold; color: #444; }
 </style>
 </head>
 <body>
+
 <div class="header">
 <h2 style="margin:0; font-size:20px;">SAGAR PUBLIC SCHOOL</h2>
 <p style="margin:5px 0 0; font-size:12px;">TEACHER PANEL</p>
 </div>
+
 <div class="card">
 <label>Select Class</label>
-<select id="sClass"><option>Nursery</option><option>LKG</option><option>UKG</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+<select id="sClass">
+  <option>Nursery</option><option>LKG</option><option>UKG</option>
+  <option>1</option><option>2</option><option>3</option><option>4</option>
+  <option>5</option><option>6</option><option>7</option><option>8</option>
+  <option>9</option><option>10</option>
+</select>
 <label>Subject</label>
 <input type="text" id="subject" placeholder="e.g. Hindi, Math">
 <label>Homework Details</label>
@@ -28,20 +36,34 @@ label { font-weight: bold; color: #444; }
 </div>
 
 <script>
-// YAHAN APNA WEB APP URL DALEIN
+// YAHAN APNA APPS SCRIPT KA URL DALEIN
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwU696rk0Akx5MC8vO8dhEm9NX15b6yjx8w4wcoWUWyRVtAyXwOtIjeTN7CGFM7X-_M/exec";
 
 function post() {
-  var btn = document.querySelector('.btn');
-  var data = {
-    sClass: document.getElementById('sClass').value,
-    subject: document.getElementById('subject').value,
-    content: document.getElementById('content').value
-  };
-  if(!data.subject || !data.content) return alert("Fill all fields");
-  
-  btn.innerText = "POSTING...";
-  btn.disabled = true;
+  var sClass = document.getElementById('sClass').value;
+  var subject = document.getElementById('subject').value;
+  var content = document.getElementById('content').value;
+
+  if(!subject || !content) {
+    return Swal.fire({
+      icon: 'warning',
+      title: 'Missing Info',
+      text: 'Please fill both Subject and Homework details.',
+      confirmButtonColor: '#b8860b'
+    });
+  }
+
+  // Show Loading
+  Swal.fire({
+    title: 'Posting Homework...',
+    text: 'Please wait while we update the diary.',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  var data = { sClass: sClass, subject: subject, content: content };
 
   fetch(WEB_APP_URL, {
     method: "POST",
@@ -49,13 +71,22 @@ function post() {
   })
   .then(res => res.json())
   .then(res => {
-    alert("Homework Posted Successfully!");
-    location.reload();
+    Swal.fire({
+      icon: 'success',
+      title: 'Posted!',
+      text: 'Homework has been successfully added to the diary.',
+      confirmButtonColor: '#002e5b'
+    }).then(() => {
+      location.reload();
+    });
   })
   .catch(err => {
-    alert("Error! Please try again.");
-    btn.innerText = "POST TO DIARY";
-    btn.disabled = false;
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Could not post homework. Try again.',
+      confirmButtonColor: '#dc3545'
+    });
   });
 }
 </script>
