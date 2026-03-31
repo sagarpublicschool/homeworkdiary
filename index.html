@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root { --navy: #002e5b; --gold: #b8860b; }
+body { font-family: 'Segoe UI', Arial; background: #f4f7f9; margin: 0; padding-top: 100px; }
+.header { background: var(--navy); color: white; text-align: center; padding: 20px; border-bottom: 5px solid var(--gold); position:fixed; top:0; width:100%; z-index:1000; }
+.container { padding: 15px; max-width: 500px; margin: auto; }
+.search-container { margin-bottom: 20px; position: sticky; top: 110px; z-index: 100; }
+#searchInput { width: 100%; padding: 12px; border: 2px solid var(--navy); border-radius: 25px; box-sizing: border-box; font-size: 16px; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.diary-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 12px; border-left: 6px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.subject-tag { background: #e8f0fe; color: var(--navy); padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 14px; }
+#loader { text-align: center; padding: 40px; color: var(--navy); font-weight: bold; }
+</style>
+</head>
+<body onload="loadData()">
+
+<div class="header">
+<h2 style="margin:0; font-size:22px;">SAGAR PUBLIC SCHOOL</h2>
+<p style="margin:5px 0 0; font-size:14px; opacity:0.9;">Homework Diary</p>
+</div>
+
+<div class="container">
+<div class="search-container">
+<input type="text" id="searchInput" onkeyup="filterData()" placeholder="Search Class or Subject...">
+</div>
+<div id="loader">Checking for updates...</div>
+<div id="diary-list"></div>
+</div>
+
+<script>
+// YAHAN APNA WEB APP URL DALEIN
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwU696rk0Akx5MC8vO8dhEm9NX15b6yjx8w4wcoWUWyRVtAyXwOtIjeTN7CGFM7X-_M/exec";
+var allData = [];
+
+function loadData() {
+  fetch(WEB_APP_URL + "?action=getHomework")
+    .then(res => res.json())
+    .then(data => {
+      var loader = document.getElementById('loader');
+      if(loader) loader.style.display = 'none';
+      allData = data;
+      renderList(data);
+    });
+}
+
+function renderList(data) {
+  var list = document.getElementById('diary-list');
+  var html = "";
+  if(!data || data.length === 0) {
+    html = "<div style='text-align:center; color:#777; padding:40px;'>No updates found.</div>";
+  } else {
+    data.forEach(function(item) {
+      html += `
+      <div class="diary-card">
+      <span class="subject-tag">${item[2]}</span>
+      <p style="font-size:16px; color:#333; margin:12px 0 5px 0; line-height:1.4;">${item[3]}</p>
+      <span style="font-size:12px; color:#777;"><b>Class: ${item[1]}</b> | Date: ${item[0]}</span>
+      </div>`;
+    });
+  }
+  list.innerHTML = html;
+}
+
+function filterData() {
+  var term = document.getElementById('searchInput').value.toLowerCase();
+  var filtered = allData.filter(function(item) {
+    return item[1].toString().toLowerCase().includes(term) || item[2].toString().toLowerCase().includes(term);
+  });
+  renderList(filtered);
+}
+</script>
+</body>
+</html>
