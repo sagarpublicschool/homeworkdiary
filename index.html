@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 :root { --navy: #002e5b; --gold: #b8860b; }
 body { font-family: 'Segoe UI', Arial; background: #f4f7f9; margin: 0; padding-top: 100px; }
@@ -30,7 +31,7 @@ body { font-family: 'Segoe UI', Arial; background: #f4f7f9; margin: 0; padding-t
 </div>
 
 <script>
-// YAHAN APNA WEB APP URL DALEIN
+// YAHAN APNA APPS SCRIPT KA URL DALEIN
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwU696rk0Akx5MC8vO8dhEm9NX15b6yjx8w4wcoWUWyRVtAyXwOtIjeTN7CGFM7X-_M/exec";
 var allData = [];
 
@@ -38,10 +39,18 @@ function loadData() {
   fetch(WEB_APP_URL + "?action=getHomework")
     .then(res => res.json())
     .then(data => {
-      var loader = document.getElementById('loader');
-      if(loader) loader.style.display = 'none';
+      document.getElementById('loader').style.display = 'none';
       allData = data;
       renderList(data);
+    })
+    .catch(err => {
+      document.getElementById('loader').innerText = "Failed to load data.";
+      Swal.fire({
+        icon: 'error',
+        title: 'Connection Error',
+        text: 'Data fetch nahi ho paya.',
+        confirmButtonColor: '#002e5b'
+      });
     });
 }
 
@@ -49,7 +58,7 @@ function renderList(data) {
   var list = document.getElementById('diary-list');
   var html = "";
   if(!data || data.length === 0) {
-    html = "<div style='text-align:center; color:#777; padding:40px;'>No updates found.</div>";
+    html = "<div style='text-align:center; color:#777; padding:40px;'>No updates found for today.</div>";
   } else {
     data.forEach(function(item) {
       html += `
